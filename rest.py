@@ -3,34 +3,33 @@ from flask import Flask, request
 import json
 import functools
 
-
 app = Flask(__name__)
 
-@app.route("/",  methods = ['POST'])
-def getSum():
+@app.route("/sum",  methods = ['POST'])
+def post():
     req_body = request.get_json()
     if 'data' in req_body:
         lis = req_body['data']
 
-        print("lis", lis)
+        # print("lis", lis)
         if len(lis) < 3 or len(lis) > 3:
-            return json.dumps({'success':False, 'message': 'Exactly 3 numbers are required'}), 400, {'ContentType':'application/json'} 
+            return json.dumps({'status': 400, 'error': 'Exactly 3 numbers are required'}), 400, {'ContentType':'application/json'} 
 
         a, b, c = lis[:]
 
         for x in lis:
-            if not str(x).isnumeric():
-                return json.dumps({'success':False, 'message': 'All inputs must be numeric'}), 400, {'ContentType':'application/json'} 
+            if type(x) != int:
+                return json.dumps({'status': 400, 'error': 'All inputs must be numeric'}), 400, {'ContentType':'application/json'} 
 
         lis = [int(n) for n  in lis]
 
         lis2 = [0 if 13 <= x <= 19 and x not in [15, 16] else x for x in lis]
 
         s = functools.reduce(lambda x, y: x + y, lis2)
-        return json.dumps({'success':True, 'result': s}), 200, {'ContentType':'application/json'} 
+        return json.dumps({'status': 200, 'result': s}), 200, {'ContentType':'application/json'} 
 
     else:
-        return json.dumps({'success':False}), 400, {'ContentType':'application/json'} 
+        return json.dumps({'status': 400, 'error': 'Something went wrong'}), 400, {'ContentType':'application/json'} 
 
 
 if __name__ == "__main__":
